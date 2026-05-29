@@ -1,100 +1,145 @@
-# Pharos Agent Transaction Firewall
+# 🛡️ Pharos Agent Transaction Firewall
 
-Pre-execution safety firewall for AI agents on Pharos.
+**Pre-execution safety firewall for AI agents on Pharos.**
 
-Before an AI agent signs or sends an onchain transaction, this skill decodes the calldata, identifies the action, checks the target and spender contracts, detects dangerous patterns such as unlimited approvals, and returns a clear policy decision:
+Before an AI agent signs or sends an onchain transaction, this skill inspects the transaction, decodes calldata, identifies what the action will do, checks the target and spender contracts, detects dangerous patterns, and returns a clear decision:
 
 ```text
-ALLOW / WARN / BLOCK
+✅ ALLOW / ⚠️ WARN / 🛑 BLOCK
 ```
 
-The goal is simple: AI agents should not blindly execute transactions. They need a safety layer that can inspect intent, explain risk, and stop obviously dangerous actions before signing.
+The core idea is simple: **AI agents should not blindly execute onchain actions.**  
+They need a guardrail that can understand intent, explain risk, and stop dangerous transactions before signing.
 
-## Why This Skill Matters
+---
 
-Pharos Agent Centre enables AI agents to interact with onchain environments through natural language and structured skills. As agents gain the ability to query, approve, swap, transfer, deploy, and automate actions, they also need guardrails.
+## ✨ What It Does
 
-This skill acts as a pre-signing firewall for Pharos:
+Pharos Agent Transaction Firewall acts as a **pre-signing security layer** for AI-native onchain workflows.
 
-- Blocks unlimited approvals to unknown spenders.
-- Warns before token transfers and unknown contract calls.
-- Detects admin-level calls such as ownership transfer, mint, pause, and unpause.
-- Checks whether the target address is a contract or an EOA.
-- Supports proposed transactions and already submitted transaction hashes.
-- Works without private keys, signatures, or write access.
+It can:
 
-## Supported Networks
+- 🛑 Block unlimited ERC20 approvals to unknown spenders.
+- ⚠️ Warn before token transfers, native value transfers, and unknown calls.
+- 🔎 Decode common calldata patterns into plain English.
+- 🧠 Classify approvals, transfers, swaps, admin calls, and unknown selectors.
+- 🏗️ Check whether the target address is a smart contract or an EOA.
+- 👀 Inspect spender/operator contracts before approving them.
+- 📜 Analyze proposed transactions or already submitted transaction hashes.
+- 🔐 Run fully read-only: no private keys, no signatures, no transaction sending.
 
-- Pharos Pacific Mainnet, chain ID `1672`
-- Pharos Atlantic Testnet, chain ID `688689`
+---
 
-Network configuration is stored in `assets/networks.json`.
+## 🚀 Why This Skill Matters
 
-## What It Can Inspect
+Pharos Agent Centre lets AI agents interact with onchain environments through natural language and structured Skills.
+
+That is powerful, but it also creates a new safety problem:
+
+> If an AI agent can approve, swap, transfer, deploy, or automate onchain actions, it needs a transaction firewall before execution.
+
+This skill is designed for exactly that moment:
+
+```text
+User intent → Agent prepares transaction → Firewall inspects it → ALLOW / WARN / BLOCK
+```
+
+It is not just a transaction decoder.  
+It is a **policy layer for AI agents before signing**.
+
+---
+
+## 🌐 Supported Networks
+
+| Network | Chain ID | Status |
+| --- | ---: | --- |
+| Pharos Pacific Mainnet | `1672` | ✅ Supported |
+| Pharos Atlantic Testnet | `688689` | ✅ Supported |
+
+Network configuration lives in:
+
+```text
+assets/networks.json
+```
+
+---
+
+## 🧩 Supported Inspection Types
 
 The firewall currently decodes and classifies:
 
-- ERC20 `approve(address,uint256)`
-- ERC20 `transfer(address,uint256)`
-- ERC20 `transferFrom(address,address,uint256)`
-- ERC721/ERC1155 `setApprovalForAll(address,bool)`
-- ERC721 `safeTransferFrom(address,address,uint256)`
-- Admin calls such as `transferOwnership`, `renounceOwnership`, `mint`, `pause`, and `unpause`
-- Common DEX-like swap selectors
-- Unknown selectors and malformed calldata
-- Native value transfers
+| Category | Supported Actions |
+| --- | --- |
+| ERC20 | `approve`, `transfer`, `transferFrom` |
+| NFT / Multi-token | `setApprovalForAll`, `safeTransferFrom` |
+| Admin controls | `transferOwnership`, `renounceOwnership`, `mint`, `pause`, `unpause` |
+| DEX-like activity | Common swap selectors |
+| Native transfers | Value transfer warnings |
+| Unknown calls | Unknown selector detection |
+| Target checks | Contract vs EOA detection |
+| Spender checks | Contract existence for approval spenders/operators |
 
-## Decision Model
+---
 
-### ALLOW
+## 🧠 Decision Model
+
+### ✅ ALLOW
 
 No major static red flags were detected.
 
-Example:
+Typical cases:
 
-- Known low-risk zero-value contract call
-- Decoded action matches expected user intent
+- Decoded action is low-risk.
+- Target contract exists.
+- No suspicious approval or admin behavior was found.
 
-### WARN
+### ⚠️ WARN
 
-The action may be legitimate, but the agent should ask for explicit confirmation.
+The action may be legitimate, but the agent should ask the user for explicit confirmation.
 
-Examples:
+Typical cases:
 
-- Token transfer
-- Limited ERC20 approval
-- Unknown function selector
-- Native value transfer
-- Unknown target token
+- Token transfer.
+- Limited ERC20 approval.
+- Native value transfer.
+- Unknown function selector.
+- Unknown target token or contract.
 
-### BLOCK
+### 🛑 BLOCK
 
 The transaction has a strong static danger signal.
 
-Examples:
+Typical cases:
 
-- Unlimited ERC20 approval to an unknown spender
-- NFT `setApprovalForAll(..., true)` to an unknown operator
-- Calldata sent to an address with no contract code
-- Nonzero native value plus unknown calldata
-- Admin/destructive function call without explicit intent
+- Unlimited ERC20 approval to an unknown spender.
+- NFT `setApprovalForAll(..., true)` to an unknown operator.
+- Calldata sent to an address with no contract code.
+- Native value sent together with unknown calldata.
+- Admin/destructive function call without explicit intent.
 
-## Installation
+---
 
-Clone this repository:
+## 📦 Installation
+
+Clone the repository:
 
 ```bash
-git clone <YOUR_GITHUB_REPO_URL>
+git clone https://github.com/Meursault44/pharos-agent-transaction-firewall.git
 cd pharos-agent-transaction-firewall
 ```
 
-No npm install is required. The skill uses Node.js built-in APIs.
+No dependency installation is required.  
+The skill uses Node.js built-in APIs.
 
 Requirements:
 
-- Node.js 18+
+```text
+Node.js 18+
+```
 
-## Usage
+---
+
+## ⚡ Quick Start
 
 Inspect a proposed transaction:
 
@@ -108,7 +153,7 @@ Inspect a proposed transaction with native value:
 node scripts/inspect-transaction.js --network mainnet --to <TARGET_ADDRESS> --data <CALLDATA> --value <VALUE_IN_WEI>
 ```
 
-Inspect an already submitted transaction:
+Inspect an existing transaction hash:
 
 ```bash
 node scripts/inspect-transaction.js --network mainnet --tx <TX_HASH>
@@ -120,18 +165,22 @@ Use Atlantic testnet:
 node scripts/inspect-transaction.js --network atlantic-testnet --to <TARGET_ADDRESS> --data <CALLDATA>
 ```
 
-## Demo Commands
+---
 
-Run a dangerous unlimited approval demo:
+## 🎬 Demo
+
+### 🛑 Demo 1: Dangerous Unlimited Approval
+
+Run:
 
 ```bash
 node scripts/inspect-transaction.js --fixture unlimited-approval
 ```
 
-Expected decision:
+Expected result:
 
 ```text
-BLOCK
+🛑 BLOCK
 ```
 
 Reason:
@@ -140,16 +189,18 @@ Reason:
 Unlimited approval to EOA/unknown spender
 ```
 
-Run a token transfer demo:
+### ⚠️ Demo 2: Token Transfer
+
+Run:
 
 ```bash
 node scripts/inspect-transaction.js --fixture safe-transfer
 ```
 
-Expected decision:
+Expected result:
 
 ```text
-WARN
+⚠️ WARN
 ```
 
 Reason:
@@ -158,7 +209,23 @@ Reason:
 Token transfer detected. Ask the user to confirm the decoded action.
 ```
 
-## Example Output
+You can also run the npm shortcuts:
+
+```bash
+npm run demo:block
+npm run demo:warn
+```
+
+On Windows PowerShell, if `npm.ps1` is blocked by execution policy, use:
+
+```powershell
+npm.cmd run demo:block
+npm.cmd run demo:warn
+```
+
+---
+
+## 📤 Example Output
 
 ```json
 {
@@ -182,7 +249,9 @@ Token transfer detected. Ask the user to confirm the decoded action.
 }
 ```
 
-## AI Agent Prompt Examples
+---
+
+## 🤖 AI Agent Prompt Examples
 
 ```text
 Use $pharos-agent-transaction-firewall to inspect this transaction before signing:
@@ -199,7 +268,9 @@ Use $pharos-agent-transaction-firewall to decode this Pharos transaction hash an
 Before approving this token spend, run the Pharos Agent Transaction Firewall and explain the risk in plain English.
 ```
 
-## Skill Structure
+---
+
+## 🗂️ Repository Structure
 
 ```text
 .
@@ -214,43 +285,77 @@ Before approving this token spend, run the Pharos Agent Transaction Firewall and
 |   `-- unlimited-approval.json
 |-- references/
 |   `-- firewall-policy.md
-`-- scripts/
-    `-- inspect-transaction.js
+|-- scripts/
+|   `-- inspect-transaction.js
+|-- package.json
+|-- README.md
+`-- LICENSE
 ```
 
-## Safety Notes
+---
 
-- Read-only by design.
-- No private keys.
-- No signatures.
-- No transaction sending.
-- No wallet connection required.
-- Uses Pharos RPC only for transaction, code, and network inspection.
+## 🔐 Safety Notes
 
-The firewall provides static pre-execution analysis. It does not guarantee that a transaction is safe, and it should be used as a guardrail before manual confirmation or agent execution.
+This skill is intentionally read-only.
 
-## Campaign Submission
+- ✅ No private keys.
+- ✅ No wallet connection.
+- ✅ No signatures.
+- ✅ No transaction sending.
+- ✅ No write operations.
+- ✅ Uses Pharos RPC only for transaction, code, and network inspection.
 
-Skill name:
+The firewall provides static pre-execution analysis. It does **not** guarantee that a transaction is safe. It should be used as a guardrail before manual confirmation or agent execution.
+
+---
+
+## 🏆 Pharos Skill Builder Campaign Submission
+
+### Skill Name
 
 ```text
 Pharos Agent Transaction Firewall
 ```
 
-Short description:
+### Brief Description
 
 ```text
-A pre-execution safety firewall for AI agents on Pharos. Before an agent signs or sends a transaction, the skill decodes calldata, identifies approvals, transfers, swaps, and admin calls, checks target and spender contracts, detects dangerous patterns like unlimited approvals, and returns an ALLOW, WARN, or BLOCK decision with a plain-English explanation.
+Pharos Agent Transaction Firewall is a pre-execution safety layer for AI agents on Pharos.
+
+Before an agent signs or sends an onchain transaction, the skill decodes calldata, identifies approvals, transfers, swaps, admin calls, and unknown selectors, checks target and spender contracts, detects dangerous patterns like unlimited approvals, and returns a clear ALLOW / WARN / BLOCK decision with a plain-English explanation.
+
+It is designed for AI-native onchain workflows where agents need guardrails before execution.
 ```
 
-Supported framework:
+### GitHub Link
 
 ```text
-Pharos Skill Engine, Node.js, Pharos Pacific Mainnet, Pharos Atlantic Testnet
+https://github.com/Meursault44/pharos-agent-transaction-firewall
 ```
 
-Extra notes:
+### Demo Commands
+
+```bash
+node scripts/inspect-transaction.js --fixture unlimited-approval
+node scripts/inspect-transaction.js --fixture safe-transfer
+```
+
+### Supported Framework
 
 ```text
-Read-only. No private key required. No signing or transaction sending. Designed as an AI-agent guardrail before onchain execution.
+Pharos Skill Engine
+Node.js 18+
+Pharos Pacific Mainnet
+Pharos Atlantic Testnet
+```
+
+### Extra Notes / Dependencies
+
+```text
+Read-only by design.
+No private key required.
+No signing.
+No transaction sending.
+No wallet connection required.
+Built as an AI-agent guardrail before onchain execution.
 ```
