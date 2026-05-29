@@ -9,6 +9,8 @@ Use this skill as a pre-signing safety layer for AI agents on Pharos. It inspect
 
 This skill is read-only. It never asks for a private key and never sends transactions.
 
+The implementation is written in TypeScript. If `dist/inspect-transaction.js` is missing or stale, run `npm install` and `npm run build` before using the CLI entrypoint.
+
 ## Inputs
 
 Support either:
@@ -26,23 +28,30 @@ Use `mainnet` for Pharos Pacific Mainnet / chain `1672`.
 
 ## Fast Path
 
+Prepare the TypeScript build:
+
+```bash
+npm install
+npm run build
+```
+
 Inspect a proposed ERC20 approval:
 
 ```bash
-node .agents/skills/pharos-agent-transaction-firewall/scripts/inspect-transaction.js --network mainnet --to <TOKEN_ADDRESS> --data <CALLDATA>
+node scripts/inspect-transaction.js --network mainnet --to <TOKEN_ADDRESS> --data <CALLDATA>
 ```
 
 Inspect an already submitted transaction:
 
 ```bash
-node .agents/skills/pharos-agent-transaction-firewall/scripts/inspect-transaction.js --network mainnet --tx <TX_HASH>
+node scripts/inspect-transaction.js --network mainnet --tx <TX_HASH>
 ```
 
 Use fixture demos:
 
 ```bash
-node .agents/skills/pharos-agent-transaction-firewall/scripts/inspect-transaction.js --fixture unlimited-approval
-node .agents/skills/pharos-agent-transaction-firewall/scripts/inspect-transaction.js --fixture safe-transfer
+node scripts/inspect-transaction.js --fixture unlimited-approval
+node scripts/inspect-transaction.js --fixture safe-transfer
 ```
 
 ## Decision Policy

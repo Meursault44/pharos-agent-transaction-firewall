@@ -128,18 +128,38 @@ git clone https://github.com/Meursault44/pharos-agent-transaction-firewall.git
 cd pharos-agent-transaction-firewall
 ```
 
-No dependency installation is required.  
-The skill uses Node.js built-in APIs.
+Install the TypeScript toolchain:
+
+```bash
+npm install
+```
+
+Build the compiled JavaScript output:
+
+```bash
+npm run build
+```
+
+The source code is written in **TypeScript** and compiled to `dist/`.  
+The `scripts/inspect-transaction.js` entrypoint is a small Node.js launcher, so users can keep the same simple command style after building.
 
 Requirements:
 
 ```text
 Node.js 18+
+TypeScript 5+
 ```
 
 ---
 
 ## ⚡ Quick Start
+
+Build first:
+
+```bash
+npm install
+npm run build
+```
 
 Inspect a proposed transaction:
 
@@ -285,9 +305,15 @@ Before approving this token spend, run the Pharos Agent Transaction Firewall and
 |   `-- unlimited-approval.json
 |-- references/
 |   `-- firewall-policy.md
+|-- src/
+|   `-- inspect-transaction.ts
+|-- dist/
+|   `-- inspect-transaction.js
 |-- scripts/
 |   `-- inspect-transaction.js
 |-- package.json
+|-- package-lock.json
+|-- tsconfig.json
 |-- README.md
 `-- LICENSE
 ```
@@ -345,6 +371,7 @@ node scripts/inspect-transaction.js --fixture safe-transfer
 ```text
 Pharos Skill Engine
 Node.js 18+
+TypeScript 5+
 Pharos Pacific Mainnet
 Pharos Atlantic Testnet
 ```
