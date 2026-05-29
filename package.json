@@ -4,13 +4,14 @@
   "description": "Pre-execution safety firewall for AI agents on Pharos.",
   "main": "dist/inspect-transaction.js",
   "bin": {
-    "pharos-firewall": "scripts/inspect-transaction.js"
+    "pharos-firewall": "dist/inspect-transaction.js"
   },
   "scripts": {
     "build": "tsc",
     "check": "npm run build && node --check dist/inspect-transaction.js",
-    "demo:block": "node scripts/inspect-transaction.js --fixture unlimited-approval",
-    "demo:warn": "node scripts/inspect-transaction.js --fixture safe-transfer"
+    "inspect": "node dist/inspect-transaction.js",
+    "demo:block": "node dist/inspect-transaction.js --fixture unlimited-approval",
+    "demo:warn": "node dist/inspect-transaction.js --fixture safe-transfer"
   },
   "keywords": [
     "pharos",

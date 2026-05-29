@@ -140,8 +140,7 @@ Build the compiled JavaScript output:
 npm run build
 ```
 
-The source code is written in **TypeScript** and compiled to `dist/`.  
-The `scripts/inspect-transaction.js` entrypoint is a small Node.js launcher, so users can keep the same simple command style after building.
+The source code is written in **TypeScript** at `scripts/inspect-transaction.ts` and compiled to `dist/inspect-transaction.js`.
 
 Requirements:
 
@@ -164,25 +163,25 @@ npm run build
 Inspect a proposed transaction:
 
 ```bash
-node scripts/inspect-transaction.js --network mainnet --to <TARGET_ADDRESS> --data <CALLDATA>
+node dist/inspect-transaction.js --network mainnet --to <TARGET_ADDRESS> --data <CALLDATA>
 ```
 
 Inspect a proposed transaction with native value:
 
 ```bash
-node scripts/inspect-transaction.js --network mainnet --to <TARGET_ADDRESS> --data <CALLDATA> --value <VALUE_IN_WEI>
+node dist/inspect-transaction.js --network mainnet --to <TARGET_ADDRESS> --data <CALLDATA> --value <VALUE_IN_WEI>
 ```
 
 Inspect an existing transaction hash:
 
 ```bash
-node scripts/inspect-transaction.js --network mainnet --tx <TX_HASH>
+node dist/inspect-transaction.js --network mainnet --tx <TX_HASH>
 ```
 
 Use Atlantic testnet:
 
 ```bash
-node scripts/inspect-transaction.js --network atlantic-testnet --to <TARGET_ADDRESS> --data <CALLDATA>
+node dist/inspect-transaction.js --network atlantic-testnet --to <TARGET_ADDRESS> --data <CALLDATA>
 ```
 
 ---
@@ -194,7 +193,7 @@ node scripts/inspect-transaction.js --network atlantic-testnet --to <TARGET_ADDR
 Run:
 
 ```bash
-node scripts/inspect-transaction.js --fixture unlimited-approval
+node dist/inspect-transaction.js --fixture unlimited-approval
 ```
 
 Expected result:
@@ -214,7 +213,7 @@ Unlimited approval to EOA/unknown spender
 Run:
 
 ```bash
-node scripts/inspect-transaction.js --fixture safe-transfer
+node dist/inspect-transaction.js --fixture safe-transfer
 ```
 
 Expected result:
@@ -305,11 +304,9 @@ Before approving this token spend, run the Pharos Agent Transaction Firewall and
 |   `-- unlimited-approval.json
 |-- references/
 |   `-- firewall-policy.md
-|-- src/
+|-- scripts/
 |   `-- inspect-transaction.ts
 |-- dist/
-|   `-- inspect-transaction.js
-|-- scripts/
 |   `-- inspect-transaction.js
 |-- package.json
 |-- package-lock.json
@@ -362,8 +359,8 @@ https://github.com/Meursault44/pharos-agent-transaction-firewall
 ### Demo Commands
 
 ```bash
-node scripts/inspect-transaction.js --fixture unlimited-approval
-node scripts/inspect-transaction.js --fixture safe-transfer
+node dist/inspect-transaction.js --fixture unlimited-approval
+node dist/inspect-transaction.js --fixture safe-transfer
 ```
 
 ### Supported Framework
