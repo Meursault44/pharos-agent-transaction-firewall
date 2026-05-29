@@ -1,0 +1,28 @@
+{
+  "name": "pharos-agent-transaction-firewall",
+  "version": "1.0.0",
+  "description": "Pre-execution safety firewall for AI agents on Pharos.",
+  "main": "scripts/inspect-transaction.js",
+  "bin": {
+    "pharos-firewall": "scripts/inspect-transaction.js"
+  },
+  "scripts": {
+    "check": "node --check scripts/inspect-transaction.js",
+    "demo:block": "node scripts/inspect-transaction.js --fixture unlimited-approval",
+    "demo:warn": "node scripts/inspect-transaction.js --fixture safe-transfer"
+  },
+  "keywords": [
+    "pharos",
+    "agent",
+    "skill",
+    "blockchain",
+    "security",
+    "firewall",
+    "calldata",
+    "approval"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  }
+}

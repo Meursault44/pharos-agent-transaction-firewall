@@ -1,0 +1,6 @@
+interface:
+  display_name: "Pharos Agent Transaction Firewall"
+  short_description: "Pre-signing safety checks for Pharos agents."
+  default_prompt: "Use $pharos-agent-transaction-firewall to inspect a Pharos transaction before signing and return an ALLOW, WARN, or BLOCK decision."
+policy:
+  allow_implicit_invocation: true
