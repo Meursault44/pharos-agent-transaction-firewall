@@ -5,11 +5,21 @@ description: Pre-execution safety firewall for AI agents on Pharos Atlantic test
 
 # Pharos Agent Transaction Firewall
 
-Use this skill as a pre-signing safety layer for AI agents on Pharos. It inspects a proposed transaction or an existing transaction hash and returns a policy decision: `ALLOW`, `WARN`, or `BLOCK`.
+Use this skill as a mandatory pre-signing safety layer for AI agents on Pharos. It inspects a proposed transaction or an existing transaction hash and returns a policy decision: `ALLOW`, `WARN`, or `BLOCK`.
 
 This skill is read-only. It never asks for a private key and never sends transactions.
 
-The implementation is written in TypeScript at `scripts/inspect-transaction.ts`. If `dist/inspect-transaction.js` is missing or stale, run `npm install` and `npm run build` before using the compiled CLI.
+The implementation is written in TypeScript at `scripts/inspect-transaction.ts`. If the compiled output is missing or stale, run `npm install` and `npm run build` before using the CLI.
+
+## Automatic Agent Rule
+
+Agents must run this firewall automatically before any Pharos write transaction, including approvals, transfers, swaps, contract writes, deployments, admin operations, and batch operations. The user should not need to explicitly ask for inspection.
+
+Decision handling:
+
+- If the firewall returns `BLOCK`, do not sign or broadcast the transaction.
+- If the firewall returns `WARN`, ask for explicit user confirmation before continuing.
+- If the firewall returns `ALLOW`, continue only when the decoded action matches the user's original intent.
 
 ## Inputs
 
@@ -38,20 +48,20 @@ npm run build
 Inspect a proposed ERC20 approval:
 
 ```bash
-node dist/inspect-transaction.js --network mainnet --to <TOKEN_ADDRESS> --data <CALLDATA>
+npm run inspect -- --network mainnet --to <TOKEN_ADDRESS> --data <CALLDATA>
 ```
 
 Inspect an already submitted transaction:
 
 ```bash
-node dist/inspect-transaction.js --network mainnet --tx <TX_HASH>
+npm run inspect -- --network mainnet --tx <TX_HASH>
 ```
 
 Use fixture demos:
 
 ```bash
-node dist/inspect-transaction.js --fixture unlimited-approval
-node dist/inspect-transaction.js --fixture safe-transfer
+npm run demo:block
+npm run demo:warn
 ```
 
 ## Decision Policy

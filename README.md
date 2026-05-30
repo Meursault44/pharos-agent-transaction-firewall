@@ -49,6 +49,38 @@ It is a **policy layer for AI agents before signing**.
 
 ---
 
+## 🤖 Automatic Agent Policy
+
+This skill is designed to be invoked **automatically by an AI agent before any write transaction on Pharos**.
+
+The agent should run the firewall whenever it prepares a transaction that may change onchain state:
+
+- approvals
+- transfers
+- swaps
+- contract writes
+- deployments
+- admin calls
+- batch operations
+
+Expected agent behavior:
+
+```text
+User asks for an onchain action
+→ Agent prepares the transaction calldata
+→ Agent automatically runs Pharos Agent Transaction Firewall
+→ Firewall returns ALLOW / WARN / BLOCK
+→ Agent follows the decision before signing or broadcasting
+```
+
+Decision handling:
+
+- 🛑 `BLOCK`: the agent must not sign or broadcast the transaction.
+- ⚠️ `WARN`: the agent must ask for explicit user confirmation.
+- ✅ `ALLOW`: the agent may continue only if the decoded action matches the original user intent.
+
+---
+
 ## 🌐 Supported Networks
 
 | Network | Chain ID | Status |
@@ -140,7 +172,7 @@ Build the compiled JavaScript output:
 npm run build
 ```
 
-The source code is written in **TypeScript** at `scripts/inspect-transaction.ts` and compiled to `dist/inspect-transaction.js`.
+The source code is written in **TypeScript** at `scripts/inspect-transaction.ts` and compiled into `dist/`.
 
 Requirements:
 
@@ -163,25 +195,25 @@ npm run build
 Inspect a proposed transaction:
 
 ```bash
-node dist/inspect-transaction.js --network mainnet --to <TARGET_ADDRESS> --data <CALLDATA>
+npm run inspect -- --network mainnet --to <TARGET_ADDRESS> --data <CALLDATA>
 ```
 
 Inspect a proposed transaction with native value:
 
 ```bash
-node dist/inspect-transaction.js --network mainnet --to <TARGET_ADDRESS> --data <CALLDATA> --value <VALUE_IN_WEI>
+npm run inspect -- --network mainnet --to <TARGET_ADDRESS> --data <CALLDATA> --value <VALUE_IN_WEI>
 ```
 
 Inspect an existing transaction hash:
 
 ```bash
-node dist/inspect-transaction.js --network mainnet --tx <TX_HASH>
+npm run inspect -- --network mainnet --tx <TX_HASH>
 ```
 
 Use Atlantic testnet:
 
 ```bash
-node dist/inspect-transaction.js --network atlantic-testnet --to <TARGET_ADDRESS> --data <CALLDATA>
+npm run inspect -- --network atlantic-testnet --to <TARGET_ADDRESS> --data <CALLDATA>
 ```
 
 ---
@@ -193,7 +225,7 @@ node dist/inspect-transaction.js --network atlantic-testnet --to <TARGET_ADDRESS
 Run:
 
 ```bash
-node dist/inspect-transaction.js --fixture unlimited-approval
+npm run demo:block
 ```
 
 Expected result:
@@ -213,7 +245,7 @@ Unlimited approval to EOA/unknown spender
 Run:
 
 ```bash
-node dist/inspect-transaction.js --fixture safe-transfer
+npm run demo:warn
 ```
 
 Expected result:
@@ -226,13 +258,6 @@ Reason:
 
 ```text
 Token transfer detected. Ask the user to confirm the decoded action.
-```
-
-You can also run the npm shortcuts:
-
-```bash
-npm run demo:block
-npm run demo:warn
 ```
 
 On Windows PowerShell, if `npm.ps1` is blocked by execution policy, use:
@@ -273,19 +298,18 @@ npm.cmd run demo:warn
 ## 🤖 AI Agent Prompt Examples
 
 ```text
-Use $pharos-agent-transaction-firewall to inspect this transaction before signing:
-to = 0x...
-data = 0x...
-network = mainnet
+Approve unlimited PDOG spending on Pharos mainnet for spender 0x1111111111111111111111111111111111111111.
 ```
 
 ```text
-Use $pharos-agent-transaction-firewall to decode this Pharos transaction hash and tell me whether an agent should allow, warn, or block it.
+Swap 10 tokens on Pharos mainnet using this prepared calldata.
 ```
 
 ```text
-Before approving this token spend, run the Pharos Agent Transaction Firewall and explain the risk in plain English.
+Transfer 1 PDOG to 0x2222222222222222222222222222222222222222 on Pharos mainnet.
 ```
+
+For each write-action prompt above, the agent should automatically run the firewall before signing or broadcasting.
 
 ---
 
@@ -359,18 +383,8 @@ https://github.com/Meursault44/pharos-agent-transaction-firewall
 ### Demo Commands
 
 ```bash
-node dist/inspect-transaction.js --fixture unlimited-approval
-node dist/inspect-transaction.js --fixture safe-transfer
-```
-
-### Supported Framework
-
-```text
-Pharos Skill Engine
-Node.js 18+
-TypeScript 5+
-Pharos Pacific Mainnet
-Pharos Atlantic Testnet
+npm run demo:block
+npm run demo:warn
 ```
 
 ### Extra Notes / Dependencies
@@ -381,5 +395,6 @@ No private key required.
 No signing.
 No transaction sending.
 No wallet connection required.
+Implemented in TypeScript.
 Built as an AI-agent guardrail before onchain execution.
 ```
